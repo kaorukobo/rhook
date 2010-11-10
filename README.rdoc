@@ -4,13 +4,13 @@
   - and can customize its behavior from outside.
 - Also you can 'hack' (== injecting hook point from outside) any methods in existing code. 
 
-== Install  ----------------------------------------------------------------------
+== Install
 
   gem install --source http://gems.github.com/ rhook
   
-== Basic Usage  ----------------------------------------------------------------------
+== Basic Usage
 
-=== step. Example code   ------------------------------
+=== step. Example code
 
   class TargetBasic
     def greeting
@@ -61,7 +61,7 @@
     t.greeting.should == "Hello, Jenkins. I am Katherine."
                                  ~~~~~~~       ~~~~~~~~~
 
-== More Basic TIPs ----------------------------------------------------------------------
+== More Basic TIPs
 
 === about '_rhook'
 
