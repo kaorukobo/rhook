@@ -124,6 +124,40 @@ describe "rhook (advanced usage)" do
   end
   # ================================================================
   
+  
+  # ================================================================
+  describe "multiple (chained) hooks" do
+    class Target
+      def chained
+        ["original"]
+      end
+    end
+    
+    example "multiple hooks" do
+      t = Target.new
+      t._rhook.hack(:chained) do |inv|
+        inv.call + ["1st_hook"]
+      end
+      t._rhook.hack(:chained) do |inv|
+        inv.call + ["2nd_hook"]
+      end
+      
+      t.chained.should == ["original", "1st_hook", "2nd_hook"]
+    end
+    
+    example "Hook to class is executed later, than one to object" do
+      t = Target.new
+      t._rhook.hack(:chained) do |inv|
+        inv.call + ["object_hook"]
+      end
+      Target._rhook.hack(:chained) do |inv|
+        inv.call + ["class_hook"]
+      end
+      
+      t.chained.should == ["original", "class_hook", "object_hook"]
+    end
+  end
+  
   # ================================================================
   describe "enable/disable" do
     class Target
@@ -207,7 +241,7 @@ describe "rhook (advanced usage)" do
       @child_group.enable      
       t.group_1.should == "g1"
       t.group_2.should == "hack2"
-
+      
       @parent_group.enable
       t.group_1.should == "hack1"
       t.group_2.should == "hack2"

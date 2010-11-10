@@ -1,8 +1,121 @@
-= rhook
+= rhook - AOP & hacking library easy with Ruby
 
-Description goes here.
+- You can provide hook point in your code,
+  - and can customize its behavior from outside.
+- Also you can 'hack' (== injecting hook point from outside) any methods in existing code. 
 
-== Note on Patches/Pull Requests
+== Install  ----------------------------------------------------------------------
+
+  gem install --source http://gems.github.com/ rhook
+  
+== Basic Usage  ----------------------------------------------------------------------
+
+=== step. Example code   ------------------------------
+
+  class TargetBasic
+    def greeting
+      my_name = "Mike"
+      your_name = "Dan"
+      hello(your_name) + "I am #{my_name}."
+    end
+    
+    def hello(name)
+      "Hello, #{name}. "
+    end
+  end #/TargetBasic
+
+==== that behaves as:
+
+    t = TargetBasic.new
+    t.greeting.should == "Hello, Dan. I am Mike."
+
+=== step. Insert hook point in TargetBasic
+
+  require "rhook"      # <==   load library.
+  
+  class TargetBasic
+    def greeting
+      my_name = _rhook.does(:my_name) { "Mike"; }         # <==  my_name = "Mike"
+      your_name = "Dan"
+      _rhook.to.hello(your_name) + "I am #{my_name}."         # <==  hello(your_name) + "I am #{my_name}."
+    end
+    
+    def hello(name)
+      "Hello, #{name}. "
+    end
+  end #/TargetBasic
+
+=== step. Add hook from outside, and change behavior.
+
+    t = TargetBasic.new
+    t._rhook.bind(:hello) { |inv|
+      inv.args[0] = "Jenkins"     # change first argument.
+      inv.call
+    }
+    t._rhook.bind(:my_name) { |inv|
+      "Katherine"     # change return value.
+    }
+
+==== that behaves as:
+
+    t.greeting.should == "Hello, Jenkins. I am Katherine."
+                                 ~~~~~~~       ~~~~~~~~~
+
+== More Basic TIPs ----------------------------------------------------------------------
+
+=== about '_rhook'
+
+Once you require 'rhook', any objects has '_rhook' method to access any rhook services. (that returns RHook::RHookService object.)
+
+    any_object = Object.new
+    any_object._rhook.RHOOK_METHOD
+
+=== What is 'inv' ?
+
+RHook::Invocation object, that contains:
+
+- call() method to proceed method invocation.
+- receiver
+- arguments passed to method
+- blocks passed to method
+- returned value by call()
+
+=== If you want 'bind' to not only an object, but any instances of class:
+
+    TargetBasic._rhook.bind(:hello) { |inv| ...
+
+=== If you want to HACK exisitng methods, use '_rhook.hack':
+
+for the paticular instance:
+
+    t = Time.now
+    t._rhook.hack(:to_s) do |inv|
+      "haha! I hacked to_s."
+    end
+    t.to_s.should == "haha! I hacked."
+
+for entire class:
+
+    Time._rhook.hack(:to_s) do |inv|
+      "haha! I hacked to_s."
+    end
+    (Time.now).to_s.should == "haha! I hacked to_s."
+
+for class method:
+
+    Time._rhook.hack(:now) do |inv|
+      "haha! you cannot get time."
+    end
+    Time.now.should == "haha! you cannot get time."
+
+
+== More Usage ...
+
+Please see spec: http://github.com/kaorukobo/rhook/blob/master/spec/rhook_spec.rb
+
+== ...
+
+=== Note on Patches/Pull Requests
  
 * Fork the project.
 * Make your feature addition or bug fix.
@@ -12,6 +125,6 @@ Description goes here.
   (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
-== Copyright
+=== Copyright
 
 Copyright (c) 2010 Kaoru Kobo. See LICENSE for details.

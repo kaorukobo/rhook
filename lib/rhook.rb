@@ -22,7 +22,7 @@ module RHook
     def bind(name, opt = {}, &block)
       hook = Hook.new
       hook.hook_proc = block
-       (@hooks_map[name.to_sym] ||= []) << hook
+       (@hooks_map[name.to_sym] ||= []).unshift( hook )
       RHook.registry.class_cached_flag_map.delete(name)
       opt[:disable] or hook.enable()
       HookGroup.add_to_current_groups(hook)
