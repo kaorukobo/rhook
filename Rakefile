@@ -5,7 +5,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "rhook"
-    gem.summary = %Q{AOP & hacking library easy with Ruby}
+    gem.summary = %Q{Easily drive AOP & hacking existing library with Ruby}
     gem.description = %Q{You can provide hook point in your code, and can customize its behavior from outside. Also you can 'hack' (== injecting hook point from outside) any methods in existing code.}
     gem.email = ""
     gem.homepage = "http://github.com/kaorukobo/rhook"

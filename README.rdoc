@@ -1,4 +1,4 @@
-= rhook - AOP & hacking library easy with Ruby
+= rhook - Easily drive AOP & hacking existing library with Ruby
 
 - You can provide hook point in your code,
   - and can customize its behavior from outside.
@@ -6,7 +6,7 @@
 
 == Install
 
-  gem install --source http://gems.github.com/ rhook
+  gem install rhook
   
 == Basic Usage
 
