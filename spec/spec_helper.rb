@@ -1,5 +1,5 @@
-# run 'spec' if *_spec.rb was executed directly. (for development using aptana)
-/.+_spec.rb$/ =~ $0 and exec("spec", "-c", $0)
+require 'rubygems'
+gem 'rspec'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
