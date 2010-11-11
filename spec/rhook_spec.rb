@@ -126,40 +126,7 @@ describe "rhook (advanced usage)" do
   
   
   # ================================================================
-  describe "multiple (chained) hooks" do
-    class Target
-      def chained
-        ["original"]
-      end
-    end
-    
-    example "multiple hooks" do
-      t = Target.new
-      t._rhook.hack(:chained) do |inv|
-        inv.call + ["1st_hook"]
-      end
-      t._rhook.hack(:chained) do |inv|
-        inv.call + ["2nd_hook"]
-      end
-      
-      t.chained.should == ["original", "1st_hook", "2nd_hook"]
-    end
-    
-    example "Hook to class is executed later, than one to object" do
-      t = Target.new
-      t._rhook.hack(:chained) do |inv|
-        inv.call + ["object_hook"]
-      end
-      Target._rhook.hack(:chained) do |inv|
-        inv.call + ["class_hook"]
-      end
-      
-      t.chained.should == ["original", "class_hook", "object_hook"]
-    end
-  end
-  
-  # ================================================================
-  describe "enable/disable" do
+  describe "Hook object (enable/disable)" do
     class Target
       def enable_disable()
         "disabled"
@@ -187,7 +154,7 @@ describe "rhook (advanced usage)" do
   
   
   # ================================================================
-  describe "Group" do
+  describe "Hook group" do
     class Target
       def group_1
         "g1"
@@ -248,5 +215,66 @@ describe "rhook (advanced usage)" do
     end
   end
   # ================================================================
+  
+end
+
+# ================================================================
+describe "rhook (behavior)" do
+  describe "Super class's hook" do
+    class Target
+    end
+    
+    class ChildTarget < Target
+      def superclass_test
+        _rhook.does(:superclass_test) { "foo"; }
+      end
+    end
+    
+    example "Super class's hook affects children class." do
+      child_t = ChildTarget.new
+      child_t.superclass_test.should == "foo"
+      # Add hook to superclass:
+      Target._rhook.bind(:superclass_test) do |inv|
+        "bar"
+      end
+      # then it affects to children class:
+      child_t.superclass_test.should == "bar"
+    end
+  end
+  
+  # ================================================================
+  describe "multiple (chained) hooks" do
+    class Target
+      def chained
+        ["original"]
+      end
+    end
+    
+    example "multiple hooks" do
+      t = Target.new
+      t._rhook.hack(:chained) do |inv|
+        inv.call + ["1st_hook"]
+      end
+      t._rhook.hack(:chained) do |inv|
+        inv.call + ["2nd_hook"]
+      end
+      
+      t.chained.should == ["original", "1st_hook", "2nd_hook"]
+    end
+    
+    example "Hook to class is executed later, than one to object" do
+      t = Target.new
+      t._rhook.hack(:chained) do |inv|
+        inv.call + ["object_hook"]
+      end
+      Target._rhook.hack(:chained) do |inv|
+        inv.call + ["class_hook"]
+      end
+      
+      t.chained.should == ["original", "class_hook", "object_hook"]
+    end
+  end
+  
+  
   
 end

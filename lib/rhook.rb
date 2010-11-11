@@ -135,26 +135,26 @@ module RHook
       end
       
       hooks = []
-      
+
       # collect hooks including ancestor classes
       begin
         concat_hooks_internal(hooks, name)
         
         # skips class without RHookService
         klass = @obj
-        while klass
+        while true
+          klass = klass.superclass
+          klass or break
           if klass._has_rhook?
-            klass._rhook.conact_class_hooks(hooks, name)
+            klass._rhook.concat_class_hooks(hooks, name)
             break
           end
-          klass = klass.superclass
         end
       end
       
       # Store to cache. 
       @class_cached_hooks_map[name] = hooks
       RHook.registry.class_cached_flag_map[name] = true
-      
       dest.concat(hooks)
     end
     
@@ -218,7 +218,7 @@ module RHook
     end
     
     def _has_rhook?
-      @rhook ? true : false
+      @_rhook ? true : false
     end
   end
   
