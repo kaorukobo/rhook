@@ -71,7 +71,7 @@ module RHook
     
     def call_method(name, method_name, args, block, opt = {})
       hooks = concat_hooks([], name)
-      hooks.empty? and @obj.__send__(method_name, *args, &block)
+      hooks.empty? and return @obj.__send__(method_name, *args, &block)
       
       inv = Invocation.new
       inv.target = @obj

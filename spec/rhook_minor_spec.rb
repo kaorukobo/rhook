@@ -11,6 +11,39 @@ describe "rhook (minor specifications / behavior, and bugs)" do
   end
   
   # ================================================================
+  describe "invocation" do
+    describe "is proceed by correct order & not rerun." do
+      class Target
+        attr_reader :order_ary
+        def order_call
+          @order_ary = []
+          _rhook.to.order_target
+        end
+        
+        def order_target
+          @order_ary << "orig"
+        end
+      end
+      
+      example do
+        t = Target.new
+        
+        # [bug] It calls the target method/procedure twice when no hooks are registered.
+        t.order_call
+        t.order_ary.should == ["orig"]
+
+        t._rhook.bind(:order_target) do |inv|
+          t.order_ary << "before_call"
+          inv.call
+          t.order_ary << "after_call"
+        end
+        t.order_call
+        t.order_ary.should == ["before_call", "orig", "after_call"]
+      end
+    end
+  end
+  
+  # ================================================================
   describe "hack" do
     # ================================================================
     describe "Can hack on private method" do 
