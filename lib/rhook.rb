@@ -30,13 +30,16 @@ module RHook
     end
     
     def hack(name, opt = {}, &block)
+      success = false
       if Class === @obj
         klass = @obj
-        klass._rhook.on_method(name)
+        success |= klass._rhook.on_method(name, :ifdef => true)
       end
       
       klass = @obj.instance_eval("class << self; self; end")
-      klass._rhook.on_method(name)
+      success |= klass._rhook.on_method(name, :ifdef => true)
+      
+      success or raise(NameError, "Method #{name} is defined in neither class nor object-specific class.")
       
       bind(name, opt, &block)
     end
@@ -96,20 +99,27 @@ module RHook
       inv.proceed()
     end
     
-    def on_method(*names)
+    def on_method(*names_and_opt)
+      success = true
+      
+      names = names_and_opt
       Class === @obj or raise("Cannot use on_method on non-Class.")
-      code = ""
+      opt = (Hash === names[-1]) ? names.pop : {}
       for method_name in names
-        # Skip if method is not defined.
-        @obj.method_defined?(method_name) or next
-        
         real_method_name = "#{method_name}__rhook_real".to_sym
         @obj.method_defined?(real_method_name) and next
         
-        code << "alias #{real_method_name} #{method_name}\n"
-        code << "def #{method_name}(*args, &block); _rhook.call_method(:#{method_name}, :#{real_method_name}, args, block); end\n"
+        begin
+          @obj.module_eval "alias #{real_method_name} #{method_name}", __FILE__, __LINE__
+        rescue NameError
+          # When method_is not defined:
+          opt[:ifdef] and (success = false; next)
+          raise NameError, "[Tried to on_method for undefined method] #{$!}"
+        end
+        @obj.module_eval "def #{method_name}(*args, &block); _rhook.call_method(:#{method_name}, :#{real_method_name}, args, block); end", __FILE__, __LINE__
       end
-      @obj.module_eval(code)
+      
+      success
     end
     
     # ================================================================
