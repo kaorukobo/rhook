@@ -113,6 +113,16 @@ for class method:
 
 Please see spec: http://github.com/kaorukobo/rhook/blob/master/spec/rhook_spec.rb
 
+== Practical Example
+
+=== 1. Log Buffer
+
+Log Buffer allows you to capture any messages written to Logger and keep in buffer.
+
+For example, you can examine the target program's log messages in testing code.
+
+http://github.com/kaorukobo/rhook/blob/master/spec/examples/log_buffer_example_spec.rb
+
 == ...
 
 === Note on Patches/Pull Requests
