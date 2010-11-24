@@ -1,8 +1,15 @@
 = rhook - Easily drive AOP & hacking existing library with Ruby
 
+- Homepage & Source --  http://github.com/kaorukobo/rhook
+- Download -- http://rubygems.org/gems/rhook
+- API Documentation (RDoc) -- http://rubydoc.info/github/kaorukobo/rhook/master/frames
+
+== Summary
+
 - You can provide hook point in your code,
   - and can customize its behavior from outside.
 - Also you can 'hack' (== injecting hook point from outside) any methods in existing code. 
+
 
 == Install
 
@@ -65,20 +72,21 @@
 
 === about '_rhook'
 
-Once you require 'rhook', any objects has '_rhook' method to access any rhook services. (that returns RHook::RHookService object.)
+Once you require 'rhook', any objects has '_rhook' method to access any rhook services. (that returns {RHook::RHookService} object.)
 
     any_object = Object.new
     any_object._rhook.RHOOK_METHOD
 
+See http://rubydoc.info/github/kaorukobo/rhook/master/RHook/RHookService
+
 === What is 'inv' ?
 
-RHook::Invocation object, that contains:
+{RHook::Invocation} object, that contains:
 
 - call() method to proceed method invocation.
-- receiver
-- arguments passed to method
-- blocks passed to method
-- returned value by call()
+- receiver, arguments/blcoks passed to method, and the other informations. See {RHook::Invocation}.
+
+See http://rubydoc.info/github/kaorukobo/rhook/master/RHook/Invocation
 
 === If you want 'bind' to not only an object, but any instances of class:
 
@@ -113,7 +121,7 @@ for class method:
 
 Please see spec: http://github.com/kaorukobo/rhook/blob/master/spec/rhook_spec.rb
 
-== Practical Example
+== Practical Examples
 
 === 1. Log Buffer
 
