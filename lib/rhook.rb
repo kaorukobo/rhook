@@ -35,8 +35,10 @@ module RHook
       @obj
     end
     
+    # ========================================================================
     # @group Methods for hook-side(outside)
-    # 
+    # ========================================================================
+
     # Add hook to the {#bound_object}. If it is a kind of Class, the hook is affected to all instance & subclasses of the class.
     # 
     # @param [Symbol] name hook-point's name (commonly equals to method name)
@@ -55,8 +57,6 @@ module RHook
       hook
     end
     
-    # @group Methods for hook-side(outside)
-    # 
     # Injects hook-point (hack) to the paticular method in {#bound_object}, and add hook same as {#bind}.
     #
     # The hook-point injection is done by 'alias' method.
@@ -91,6 +91,10 @@ module RHook
       self
     end
     
+    # ========================================================================
+    # @endgroup
+    # ========================================================================
+
     # @private
     class Caller
       def initialize(rhook, opt)
@@ -103,8 +107,10 @@ module RHook
       end
     end #/Caller
     
-    # @group Methods for target-side (ex. providing hook-point)
-    # 
+    # ========================================================================
+    # @group Methods for target-side (for providing hook-point)
+    # ========================================================================
+
     # Wraps {#bound_object}'s method call to be hookable.
     #
     # @example 
@@ -132,8 +138,6 @@ module RHook
       inv.proceed()
     end
     
-    # @group Methods for target-side (ex. providing hook-point)
-    # 
     # Wraps the code block to be hookable.
     #
     # @example
@@ -158,8 +162,6 @@ module RHook
       inv.proceed()
     end
     
-    # @group Methods for target-side (ex. providing hook-point)
-    # 
     # Wraps the defined method to be hookable.
     # 
     # If possible, using {#to} is recommended than {#on_method}, because if the subclass override the hookable method, the subclasse's code become out of hook target.
@@ -196,6 +198,10 @@ module RHook
       success
     end
     
+    # ========================================================================
+    # @endgroup
+    # ========================================================================
+
     # @private
     def concat_hooks(dest, name)
       if Class === @obj
