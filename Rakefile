@@ -43,3 +43,12 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
+
+begin
+  gem "yard"
+  require "yard"
+  YARD::Rake::YardocTask.new do |t|
+  end
+rescue Gem::LoadError
+  
+end
