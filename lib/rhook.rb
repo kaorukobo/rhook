@@ -63,6 +63,8 @@ module RHook
     # If the hook-point is already injected, this just does {#bind}.
     #
     # @param [Symbol] name    The name of method to hack.
+    # @yield [inv]
+    # @return [Hook]
     # @see #bind See #bind for other param/return.
     def hack(name, opt = {}, &block)
       success = false
@@ -82,9 +84,11 @@ module RHook
     # @group Methods for hook-side(outside)
     # 
     # Unbind all hooks bound to {#bound_object}.
+    # @return [self]
     def unbind_all
       @hooks_map.clear
       @class_cached_hooks_map.clear
+      self
     end
     
     # @private
@@ -249,7 +253,7 @@ module RHook
   # @attr [Object] target The target object that the hook is applied. (Usually same to {#receiver})
   # @attr [Object] receiver The receiver object of this method invocation.
   # @attr [Array<Object>] args The arguments given to the method invocation. 
-  # @attr [Object] block The block given to the method invocation
+  # @attr [Proc] block The block given to the method invocation
   # @attr [Object] returned The returned value by the method invocation. (Don't set this. To change it, just return by the alternative value from the hook procedure.) 
   # @attr [Array<Hook>] hooks (Internally used) The applied hooks on this invocation.
   # @attr [Proc] target_proc (Internally used) The procedure to execute the target method/procedure.
@@ -281,8 +285,10 @@ module RHook
   # The registered hook instance returned by #{RHookService#bind}.
   class Hook
     # Whether this hook is enabled.
+    # @return [Boolean] 
     attr_accessor :enabled
-    # The hook procedure.
+    # The hook procedure registered by {RHookService#bind}.
+    # @return [Proc] 
     attr_accessor :hook_proc
     
     # @private
@@ -295,6 +301,7 @@ module RHook
     # @overload enable()
     # @overload enable(&block)
     # @yield If block was given, the hook is enabled only within the given code block. (Note: This is not thread-safe.)
+    # @return [self]
     def enable(&block)
       @enabled = true
       if block_given?
@@ -308,6 +315,7 @@ module RHook
     end
     
     # Disable this hook.
+    # @return [self]
     def disable
       @enabled = false
       self
@@ -317,6 +325,7 @@ module RHook
   # 
   class ::Object
     # Get {RHookService} object bound to this object.
+    # @return [RHookService]
     def _rhook
       @_rhook ||= RHook::RHookService.new(self)
     end
@@ -338,12 +347,14 @@ module RHook
     end
     
     # Add a new hook to this group.
+    # @return [self]
     def add(hook)
       @hooks << hook
+      self
     end
     
     # Add any hooks to this group that was registered by #{RHookService#bind} in the given block code.
-    # @return [HookGroup] itself
+    # @return [self]
     def wrap(&block)
       group_stack = (Thread.current["rhook_group"] ||= [])
       group_stack << self 
@@ -356,6 +367,7 @@ module RHook
     end
     
     # Enable the hooks.
+    # @return [self]
     # @see Hook#enable
     def enable(&block)
       @hooks.each do |h|
@@ -372,6 +384,7 @@ module RHook
     end
     
     # Disable the hooks.
+    # @return [self]
     # @see Hook#disable
     def disable
       @hooks.each do |h|
