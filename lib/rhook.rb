@@ -169,10 +169,9 @@ module RHook
     # @example
     #   on_method :method_name
     #
-    # @overload on_method(name1, name2, ..., opt = {})
-    # @param [String] name The method name. (can specify multiple.)
-    # @param _and_opt [Hash] Options
-    #     * :ifdef => true - Don't raise error whenever the method is not defined.
+    # @overload on_method(*names, opt = {})
+    #   @param [Symbol] names The method name(s).
+    #   @option opt [Boolean] :ifdef If true, it doesn't raise error whenever the method is not defined.
     # @raise [NameError] If the method is not defined.
     # @return [Boolean] When :ifdef => true, returns sucess or not, otherwise always true.
     def on_method(*names_and_opt)
