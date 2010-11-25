@@ -255,12 +255,12 @@ module RHook
   
   # The object contains the invocation information.
   #
-  # @attr [Object] target The target object that the hook is applied. (Usually same to {#receiver})
-  # @attr [Object] receiver The receiver object of this method invocation.
+  # @attr_reader [Object] target The target object that the hook is applied. (Usually same to {#receiver})
+  # @attr_reader [Object] receiver The receiver object of this method invocation.
   # @attr [Array<Object>] args The arguments given to the method invocation. 
   # @attr [Proc] block The block given to the method invocation
-  # @attr [Object] returned The returned value by the method invocation. (Don't set this. To change it, just return by the alternative value from the hook procedure.) 
-  # @attr [Array<Hook>] hooks (Internally used) The applied hooks on this invocation.
+  # @attr_reader [Object] returned The returned value by the method invocation. (Don't set this. To change it, just return by the alternative value from the hook procedure.) 
+  # @attr_reader [Array<Hook>] hooks (Internally used) The applied hooks on this invocation.
   # @attr [Proc] target_proc (Internally used) The procedure to execute the target method/procedure.
   # @attr [Hash] hint Hint data given by {RHookService#does} / {RHookService#to}.
   class Invocation < Struct.new(:target, :receiver, :args, :block, :returned, :hooks, :target_proc, :hint)
@@ -274,11 +274,11 @@ module RHook
     def proceed
       hook = hooks[@hook_index]
       # -- If no more hook was found, calls target procedure and return
-      hook or return target_proc.call(*args, &block)
+      hook or return self.returned = target_proc.call(*args, &block)
       # -- Set hook pointer to next, then call next hook
       @hook_index += 1
       begin
-        hook.call(self)
+        self.returned = hook.call(self)
       ensure
         @hook_index -= 1
       end
@@ -329,8 +329,8 @@ module RHook
   
   # 
   class ::Object
-    # Get {RHookService} object bound to this object.
-    # @return [RHookService]
+    # Get {RHook::RHookService} object bound to this object.
+    # @return [RHook::RHookService]
     def _rhook
       @_rhook ||= RHook::RHookService.new(self)
     end

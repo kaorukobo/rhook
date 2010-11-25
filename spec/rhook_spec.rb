@@ -216,6 +216,51 @@ describe "rhook (advanced usage)" do
   end
   # ================================================================
   
+  # ========================================================================
+  describe "Invocation object" do
+    class Target
+      def invocation_object(*args, &block)
+        _rhook.to(:hint => {:hintkey => :hintval}).invocation_object_target(*args, &block)
+      end
+      
+      def invocation_object_target(*args, &block)
+        :returned_value
+      end
+    end #/Target
+    
+    example "attributes" do
+      args = [1, 2]
+      block = lambda do
+        
+      end
+      
+      lambda { |called|
+        t = Target.new
+        t._rhook.bind(:invocation_object_target) { |inv|
+          # first hook
+          called.yes
+          inv.call()
+          inv.returned.should == :returned_value
+          :returned_value_hooked
+        }
+        t._rhook.bind(:invocation_object_target) { |inv|
+          # second hook
+          called.yes
+          inv.args.should == args
+          inv.block.should == block
+          inv.hint[:hintkey].should == :hintval
+          inv.receiver.should == t
+          inv.target.should == t
+          inv.returned.should be_nil
+          inv.call()
+          inv.returned.should == :returned_value_hooked
+        }
+        t.invocation_object(*args, &block)
+      }.should calls_hook(:times => 2)
+    end
+  end
+  # ========================================================================
+  
 end
 
 # ================================================================
