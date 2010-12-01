@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kaoru Kobo"]
-  s.date = %q{2010-11-25}
+  s.date = %q{2010-12-01}
   s.description = %q{You can provide hook point in your code, and can customize its behavior from outside. Also you can 'hack' (== injecting hook point from outside) any methods in existing code.}
   s.email = %q{}
   s.extra_rdoc_files = [
@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "examples/log_socket_data.rb",
     "lib/rhook.rb",
     "rhook.gemspec",
     "spec/examples/log_buffer_example_spec.rb",
@@ -31,11 +32,13 @@ Gem::Specification.new do |s|
     "spec/spec.opts",
     "spec/spec_helper.rb"
   ]
+  s.has_rdoc = %q{yard}
   s.homepage = %q{http://github.com/kaorukobo/rhook}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{Easily drive AOP & hacking existing library with Ruby}
   s.test_files = [
+    "examples/log_socket_data.rb",
     "spec/examples/log_buffer_example_spec.rb",
     "spec/rhook_minor_spec.rb",
     "spec/rhook_spec.rb",
@@ -48,11 +51,14 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
+      s.add_development_dependency(%q<yard>, ["~> 0.6.0"])
     else
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
+      s.add_dependency(%q<yard>, ["~> 0.6.0"])
     end
   else
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
+    s.add_dependency(%q<yard>, ["~> 0.6.0"])
   end
 end
 
