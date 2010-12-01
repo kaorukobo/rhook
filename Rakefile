@@ -1,6 +1,9 @@
 require 'rubygems'
 require 'rake'
 
+require "logger"
+log = Logger.new(STDERR)
+
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
@@ -11,6 +14,8 @@ begin
     gem.homepage = "http://github.com/kaorukobo/rhook"
     gem.authors = ["Kaoru Kobo"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
+    gem.add_development_dependency "yard", "~> 0.6.0"
+    gem.has_rdoc = "yard"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
@@ -34,21 +39,11 @@ task :spec => :check_dependencies
 
 task :default => :spec
 
-require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "rhook #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-end
-
 begin
   gem "yard"
   require "yard"
   YARD::Rake::YardocTask.new do |t|
   end
 rescue Gem::LoadError
-  
+  log.warn "Install YARD to generate document."
 end
