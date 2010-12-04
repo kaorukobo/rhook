@@ -31,7 +31,7 @@ describe "rhook (minor specifications / behavior, and bugs)" do
         # [bug] It calls the target method/procedure twice when no hooks are registered.
         t.order_call
         t.order_ary.should == ["orig"]
-
+        
         t._rhook.bind(:order_target) do |inv|
           t.order_ary << "before_call"
           inv.call
@@ -118,6 +118,31 @@ describe "rhook (minor specifications / behavior, and bugs)" do
         # if success, it returns true
         result = Target._rhook.on_method(:on_method_test_non_existent, :ifdef => true)
         result.should == true
+      end
+      
+    end
+    
+    # ========================================================================
+    describe "is applied to the method (== 'hack'ed), and also it is called via _rhook.to(), " do
+      class Target
+        def both_on_method_and_to
+          _rhook.to.both_on_method_and_to_target
+        end
+        
+        def both_on_method_and_to_target
+          
+        end
+      end
+      
+      example "even though, the hook should be just called once." do
+        m = mock
+        m.should_receive(:called).once
+        
+        Target._rhook.hack(:both_on_method_and_to_target) { |inv|
+          m.called
+          inv.call
+        } 
+        Target.new.both_on_method_and_to()
       end
     end
   end

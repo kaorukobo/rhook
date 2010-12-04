@@ -21,6 +21,8 @@ module RHook
   class RHookService
     # @private
     attr_reader :hooks_map
+    # @private
+    attr_accessor :last_name_call_method_done
     
     # @private
     def initialize(obj)
@@ -124,6 +126,11 @@ module RHook
     
     # @private
     def call_method(name, method_name, args, block, opt = {})
+      if @last_name_call_method_done == name
+        return @obj.__send__(method_name, *args, &block)
+      end
+      @last_name_call_method_done = name
+      
       hooks = concat_hooks([], name)
       hooks.empty? and return @obj.__send__(method_name, *args, &block)
       
@@ -136,6 +143,8 @@ module RHook
       inv.target_proc = @obj.method(method_name)
       inv.hint = opt[:hint] || {}
       inv.proceed()
+    ensure
+      @last_name_call_method_done = nil
     end
     
     # Wraps the code block to be hookable.
