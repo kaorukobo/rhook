@@ -234,29 +234,31 @@ describe "rhook (advanced usage)" do
         
       end
       
-      lambda { |called|
-        t = Target.new
-        t._rhook.bind(:invocation_object_target) { |inv|
-          # first hook
-          called.yes
-          inv.call()
-          inv.returned.should == :returned_value
+      m = mock
+      m.should_receive(:second).once.ordered
+      m.should_receive(:first).once.ordered
+      
+      t = Target.new
+      t._rhook.bind(:invocation_object_target) { |inv|
+        # first hook
+        m.first
+        inv.call()
+        inv.returned.should == :returned_value
           :returned_value_hooked
-        }
-        t._rhook.bind(:invocation_object_target) { |inv|
-          # second hook
-          called.yes
-          inv.args.should == args
-          inv.block.should == block
-          inv.hint[:hintkey].should == :hintval
-          inv.receiver.should == t
-          inv.target.should == t
-          inv.returned.should be_nil
-          inv.call()
-          inv.returned.should == :returned_value_hooked
-        }
-        t.invocation_object(*args, &block)
-      }.should calls_hook(:times => 2)
+      }
+      t._rhook.bind(:invocation_object_target) { |inv|
+        # second hook
+        m.second
+        inv.args.should == args
+        inv.block.should == block
+        inv.hint[:hintkey].should == :hintval
+        inv.receiver.should == t
+        inv.target.should == t
+        inv.returned.should be_nil
+        inv.call()
+        inv.returned.should == :returned_value_hooked
+      }
+      t.invocation_object(*args, &block)
     end
   end
   # ========================================================================
