@@ -44,7 +44,8 @@ module RHook
     # Add hook to the {#bound_object}. If it is a kind of Class, the hook is affected to all instance & subclasses of the class.
     # 
     # @param [Symbol] name hook-point's name (commonly equals to method name)
-    # @option opt [true] :disable Create hook but make disabled. (by default, automatically enabled.)
+    # @option opt [true] :disable Creates hook but make disabled. (by default, automatically enabled.)
+    # @option opt [RHook::HookGroup] :group Adds itself into the specified hook-group.
     # @yield [inv] The hook block.
     # @yieldparam [Invocation] inv
     # @yieldreturn The result value. (Returned value of called method.)
@@ -55,7 +56,11 @@ module RHook
        (@hooks_map[name.to_sym] ||= []).unshift( hook )
       RHook.registry.class_cached_flag_map.delete(name)
       opt[:disable] or hook.enable()
-      HookGroup.add_to_current_groups(hook)
+      if opt[:group]
+        opt[:group].add(hook)
+      else
+        HookGroup.add_to_current_groups(hook)
+      end
       hook
     end
     
@@ -407,6 +412,12 @@ module RHook
       self
     end
     
+    # Tests the given hook is registered in this group.
+    # @return [Boolean]
+    def include?(hook)
+      @hooks.include?(hook)
+    end
+    
     # @private
     def self.add_to_current_groups(hook)
      (Thread.current["rhook_group"] || []).each do |group|
@@ -424,8 +435,14 @@ module RHook
   #   }
   #   XXX_feature_for_library.disable
   # 
+  # @example
+  #   grp = RHook.group
+  #   Target._rhook.bind(..., :group => grp) { ... }
+  #
   # @return [HookGroup]
   def self.group(&block)
-    HookGroup.new.wrap(&block)
+    group = HookGroup.new
+    block and group.wrap(&block)
+    group
   end
 end

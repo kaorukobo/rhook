@@ -213,6 +213,16 @@ describe "rhook (advanced usage)" do
       t.group_1.should == "hack1"
       t.group_2.should == "hack2"
     end
+    
+    example "Adding a hook to group with bind()'s :group option." do
+      # Instantiate a group with RHook.group() without block.
+      group = RHook.group
+      t = Target.new
+      hook = t._rhook.hack(:group_1, :group => group) do |inv|
+        inv.call
+      end
+      group.include?(hook).should be_true
+    end
   end
   # ================================================================
   
