@@ -145,7 +145,9 @@ module RHook
       inv.args = args
       inv.block = block
       inv.hooks = hooks
-      inv.target_proc = @obj.method(method_name)
+      inv.target_proc = lambda do |*args, &block|
+        @obj.__send__(method_name, *args, &block)
+      end
       inv.hint = opt[:hint] || {}
       inv.proceed()
     ensure

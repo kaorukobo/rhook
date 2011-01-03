@@ -146,4 +146,44 @@ describe "rhook (minor specifications / behavior, and bugs)" do
       end
     end
   end
+  
+  # ========================================================================
+  describe "#call_method(#to): " do
+    before :each do
+    end
+    
+    example "[bugfix] super: no superclass method" do
+      class CallMethodSuperTest_Super
+        def the_method
+          
+        end
+      end
+      
+      module CallMethodSuperTest_Module
+        def the_method
+          super
+        end
+      end
+      
+      class CallMethodSuperTest_Inherited < CallMethodSuperTest_Super
+        include CallMethodSuperTest_Module
+      end
+      
+      # This bug does not appear without hooks.
+      CallMethodSuperTest_Inherited._rhook.bind(:the_method) do |inv|
+        inv.call
+      end
+      
+      # OK.
+      CallMethodSuperTest_Inherited.new.the_method
+      
+      # We fixed the bug this cause error:
+      lambda {
+        CallMethodSuperTest_Inherited.new._rhook.to.the_method
+      }.should_not raise_error
+      # - super: no superclass method `the_method'
+    end
+  end
+  # ========================================================================
+  
 end
