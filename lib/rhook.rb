@@ -130,6 +130,21 @@ module RHook
     end
     
     # @private
+    # Used in call_method
+    # Instead of ''lambda { |*args, &block| @obj.__send__(method_name, *args, &block); }''
+    # because some earlier versions of Ruby-1.8 cannot parse it.
+    class MethodCaller
+      def initialize(obj, method_name)
+        @obj = obj
+        @method_name = method_name
+      end
+      
+      def call(*args, &block)
+        @obj.__send__(@method_name, *args, &block)
+      end
+    end #/MethodCaller
+    
+    # @private
     def call_method(name, method_name, args, block, opt = {})
       if @last_name_call_method_done == name
         return @obj.__send__(method_name, *args, &block)
@@ -145,9 +160,7 @@ module RHook
       inv.args = args
       inv.block = block
       inv.hooks = hooks
-      inv.target_proc = lambda do |*args, &block|
-        @obj.__send__(method_name, *args, &block)
-      end
+      inv.target_proc = MethodCaller.new(@obj, method_name)
       inv.hint = opt[:hint] || {}
       inv.proceed()
     ensure
