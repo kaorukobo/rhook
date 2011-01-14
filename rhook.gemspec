@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rhook}
-  s.version = "0.1.6"
+  s.version = "0.1.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kaoru Kobo"]
-  s.date = %q{2010-12-01}
+  s.date = %q{2011-01-14}
   s.description = %q{You can provide hook point in your code, and can customize its behavior from outside. Also you can 'hack' (== injecting hook point from outside) any methods in existing code.}
   s.email = %q{}
   s.extra_rdoc_files = [
@@ -23,6 +23,8 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "examples/benchmark_empty_method.rb",
+    "examples/benchmark_logger.rb",
     "examples/log_socket_data.rb",
     "lib/rhook.rb",
     "rhook.gemspec",
@@ -38,6 +40,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{Easily drive AOP & hacking existing library with Ruby}
   s.test_files = [
+    "examples/benchmark_empty_method.rb",
+    "examples/benchmark_logger.rb",
     "examples/log_socket_data.rb",
     "spec/examples/log_buffer_example_spec.rb",
     "spec/rhook_minor_spec.rb",
