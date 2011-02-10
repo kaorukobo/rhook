@@ -216,6 +216,26 @@ describe "rhook (advanced usage)" do
       t.group_2.should == "g2"
     end
     
+    example "within by group" do
+      group = RHook.group do
+        Target._rhook.hack(:group_1) do |inv|
+          "hack1"
+        end
+        Target._rhook.hack(:group_2) do |inv|
+          "hack2"
+        end
+      end
+      
+      t = Target.new
+      group.within do
+        t.group_1.should == "hack1"
+        t.group_2.should == "hack2"
+      end
+      t.group_1.should == "g1"
+      t.group_2.should == "g2"
+    end
+    
+    
     example "Nested group" do
       @parent_group = RHook.group do
         Target._rhook.hack(:group_1) do |inv|

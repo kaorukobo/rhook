@@ -463,6 +463,27 @@ module RHook
       self
     end
     
+    # Unbind the hooks.
+    # @return [self]
+    # @see Hook#unbind
+    def unbind
+      @hooks.each do |h|
+        h.unbind
+      end
+      self
+    end
+    
+    # After executing block, do {#unbind}.
+    # @return nil (Should return either self or block's result...?)
+    def within(&block)
+      begin
+        yield
+      ensure
+        unbind
+      end
+      nil
+    end
+    
     # Tests the given hook is registered in this group.
     # @return [Boolean]
     def include?(hook)
