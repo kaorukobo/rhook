@@ -51,9 +51,12 @@ module RHook
     # @yieldreturn The result value. (Returned value of called method.)
     # @return [Hook] Created hook.
     def bind(name, opt = {}, &block)
+      name = name.to_sym
       hook = Hook.new
       hook.hook_proc = block
-       (@hooks_map[name.to_sym] ||= []).unshift( hook )
+      hook.bound_info = [self, name]
+      array = (@hooks_map[name] ||= [])
+      array.unshift( hook )
       RHook.registry.class_cached_flag_map.delete(name)
       opt[:disable] or hook.enable()
       if opt[:group]
@@ -95,6 +98,18 @@ module RHook
     def unbind_all
       @hooks_map.clear
       @class_cached_hooks_map.clear
+      self
+    end
+    
+    # @group Methods for hook-side(outside)
+    # 
+    # Unbind the bound hook on {#bound_object}. (Not commonly used, use {RHook::Hook#unbind}.)
+    # @return [self]
+    def unbind(name, hook_object)
+      name = name.to_sym
+      array = @hooks_map[name] or return
+      array.delete(hook_object)
+      RHook.registry.class_cached_flag_map.delete(name)
       self
     end
     
@@ -324,6 +339,8 @@ module RHook
     # The hook procedure registered by {RHookService#bind}.
     # @return [Proc] 
     attr_accessor :hook_proc
+    # @private
+    attr_accessor :bound_info
     
     # @private
     def call(inv)
@@ -352,6 +369,14 @@ module RHook
     # @return [self]
     def disable
       @enabled = false
+      self
+    end
+    
+    # Unbind this hook.
+    # @return [self]
+    def unbind
+      service, name = @bound_info
+      service.unbind(name, self)
       self
     end
   end #/Hook
