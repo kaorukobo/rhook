@@ -126,7 +126,7 @@ describe "rhook (advanced usage)" do
   
   
   # ================================================================
-  describe "Hook object (enable/disable/unbind)" do
+  describe "Hook object (enable/disable/unbind/within)" do
     class Target
       def enable_disable()
         "disabled"
@@ -166,6 +166,17 @@ describe "rhook (advanced usage)" do
       hook.unbind
       
       t = Target.new
+      t.unbind_test.should == "unbound"
+    end
+    
+    example "within" do
+      t = Target.new
+      
+      Target._rhook.hack(:unbind_test) { |inv|
+        "bound"
+      }.within {
+        t.unbind_test.should == "bound"
+      }
       t.unbind_test.should == "unbound"
     end
   end

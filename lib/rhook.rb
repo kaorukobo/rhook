@@ -379,6 +379,17 @@ module RHook
       service.unbind(name, self)
       self
     end
+    
+    # After executing block, do {#unbind}.
+    # @return nil (Should return either self or block's result...?)
+    def within(&block)
+      begin
+        yield
+      ensure
+        unbind
+      end
+      nil
+    end
   end #/Hook
   
   # 
