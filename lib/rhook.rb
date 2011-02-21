@@ -297,6 +297,11 @@ module RHook
       hooks = @hooks_map[name]
       hooks and dest.concat(hooks)
     end
+    
+    # @private
+    def inspect
+      "#<#{self.class}>"
+    end
   end #/RHookService
   
   # The object contains the invocation information.
@@ -519,4 +524,21 @@ module RHook
     block and group.wrap(&block)
     group
   end
+
+  # Return the hook procedure to trace information about method invocation.
+  #
+  # @option opt [String,Symbol] :tag Append prefix [tag] (default: 'trace')
+  # @option opt [Array] :caller_range Specify [BEGIN, COUNT_OF_LOCATIONS] -> Prints COUNT_OF_LOCATIONS caller locations from caller(BEGIN) (default: RHook::TRACER_CALLER_RANGE_DEFAULT)
+  # @return [Proc]
+  # @example
+  #   TheClass._rhook.hack(:the_method, &RHook.tracer)
+  def self.tracer(opt = {})
+    require "rhook/tracer"
+    tracer_impl(opt)
+  end
+
+  class << self
+    attr_accessor :trace_printer
+  end
+  self.trace_printer = lambda { |msg| $stderr.print(msg); }
 end
