@@ -308,6 +308,7 @@ describe "rhook (advanced usage)" do
       t._rhook.bind(:invocation_object_target) { |inv|
         # second hook
         m.second
+        inv.name.should == :invocation_object_target
         inv.args.should == args
         inv.block.should == block
         inv.hint[:hintkey].should == :hintval

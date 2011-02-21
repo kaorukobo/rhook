@@ -172,6 +172,7 @@ module RHook
       inv = Invocation.new
       inv.target = @obj
       inv.receiver = @obj
+      inv.name = name
       inv.args = args
       inv.block = block
       inv.hooks = hooks
@@ -198,6 +199,7 @@ module RHook
       inv = Invocation.new
       inv.target = @obj
       inv.receiver = nil
+      inv.name = name
       inv.args = []
       inv.block = nil
       inv.hooks = hooks
@@ -307,7 +309,7 @@ module RHook
   # @attr_reader [Array<Hook>] hooks (Internally used) The applied hooks on this invocation.
   # @attr [Proc] target_proc (Internally used) The procedure to execute the target method/procedure.
   # @attr [Hash] hint Hint data given by {RHookService#does} / {RHookService#to}.
-  class Invocation < Struct.new(:target, :receiver, :args, :block, :returned, :hooks, :target_proc, :hint)
+  class Invocation < Struct.new(:target, :receiver, :name, :args, :block, :returned, :hooks, :target_proc, :hint)
     # @private
     def initialize
       @hook_index = 0
