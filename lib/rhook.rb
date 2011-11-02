@@ -46,6 +46,7 @@ module RHook
     # @param [Symbol] name hook-point's name (commonly equals to method name)
     # @option opt [true] :disable Creates hook but make disabled. (by default, automatically enabled.)
     # @option opt [RHook::HookGroup] :group Adds itself into the specified hook-group.
+    # @option opt [Symbol] :once Binds the given hook only once. (give a key to identify this hook. See rhook_minor_spec.rb)
     # @yield [inv] The hook block.
     # @yieldparam [Invocation] inv
     # @yieldreturn The result value. (Returned value of called method.)
@@ -56,6 +57,15 @@ module RHook
       hook.hook_proc = block
       hook.bound_info = [self, name]
       array = (@hooks_map[name] ||= [])
+      
+      once_key = opt[:once]
+      if once_key
+        existing_hook = array.find { |hk|
+          hk.once_key == once_key
+        }
+        existing_hook and return existing_hook
+        hook.once_key = once_key
+      end
       array.unshift( hook )
       RHook.registry.class_cached_flag_map.delete(name)
       opt[:disable] or hook.enable()
@@ -348,6 +358,8 @@ module RHook
     attr_accessor :hook_proc
     # @private
     attr_accessor :bound_info
+    # @private
+    attr_accessor :once_key
     
     # @private
     def call(inv)
